@@ -33,7 +33,7 @@ int main()
 #ifdef _local
 	FIN;
 #endif // _local
-	int n = 0;
+	int n = 0; 
 	cin >> n;
 	while(n--)
 	{
