@@ -7,46 +7,58 @@
 typedef long long LL;
 using namespace std;
 const int MAX = 40 + 5;
-LL dp[MAX][2][2];
+LL dp[MAX];
 int shu[MAX];
-
-LL dfs(int len, bool is4, bool state, bool limit)
+int ans[MAX];
+int n = 0, k = 0; 
+bool finish;
+int dfs(int len, int res, bool isin, bool allzero,  bool limit)
 {
 	if (len == -1)
-		return state;
+	{
+		if (res == 1 && isin==false)
+			finish = true;
+		return 1;
+	}
 
-	//如果被记忆化搜索过了，就直接返回
-	if (limit == false && dp[len][is4][state] != -1)
-		return dp[len][is4][state];
-	
-	LL cnt = 0;
+	if (limit == false && dp[len] != -1 && isin==false)
+		return dp[len];
+
+	int cnt = 0;
+	int c = 0;
 	for (int i = 0; i <= (limit ? shu[len] : 9); i++)
 	{
-		cnt += dfs(len - 1, i==4, (is4 && i ==9) || state, limit && i == shu[len]);
+		ans[len] = i;
+		c = dfs(len - 1, res - cnt, false, allzero && i==0, limit && i == shu[len]);
+		if(cnt + c>=res)
+			dfs(len - 1, res - cnt, true, allzero && i==0, limit && i == shu[len]);
+		cnt += c;
+
+		if (finish) return 0;
 	}
-	if (limit == false)
-		dp[len][is4][state] = cnt;
-	return cnt;
+	return  limit ? cnt : dp[len] = cnt;
 }
 int main()
 {
 #ifdef _local
 	FIN;
 #endif // _local
-	int n = 0; 
-	cin >> n;
-	while(n--)
+	while(cin >> n >> k)
 	{
-		LL N = 0;
-		scanf("%lld", &N);
+		k += 1;
+		finish = false;
 		mem(dp, -1);
 		int cnt = 0;
-		while (N)
+		while (n)
 		{
-			shu[cnt++] = N % 10;
-			N /= 10;
+			shu[cnt++] = n % 10;
+			n /= 10;
 		}
-		cout << dfs(cnt - 1, false,false, true) << endl;
+
+		dfs(cnt - 1, k, true, true, true);
+		for (int i = cnt -1; i >= 0; i--)
+			printf("%d", ans[i]);
+		cout << endl;
 	}
 	return 0;
 }
