@@ -1,5 +1,6 @@
 #include<iostream>
 #include<stdio.h>
+#include<vector>
 #include<algorithm>
 #define FIN freopen("input.txt", "r", stdin);
 #define fuck cout<<"fuck"<<endl;
@@ -7,82 +8,56 @@
 typedef long long LL;
 using namespace std;
 const int MAX = 40 + 5;
-LL dp[MAX][3];
-int shu[MAX];
-int ans[MAX];
-int n = 0, k = 0;
-bool finish;
-int icnt = 0;
-int dfs(int len, int res, bool isin, int limit)
-{
-	if (res == 1)
-	{
-		finish = true;
-		return 0;
-	}
-	if ((limit == 2 && len == 0) || len == -1)
-	{
-		return 1;
-	}
-	if(dp[len][limit] != -1 && isin == false)
-		return dp[len][limit];
-	int c = 0;
-	int cnt = 1;
-	for (int i = ((len == icnt - 1) ? 1 : 0); i <= (limit == 1 && len == 0 ? shu[len] : 9); i++)
-	{
-		ans[len] = i;
-		if (limit == 0 ||(limit ==1 &&i < shu[len]))
-			c = dfs(len - 1, res - cnt, false, 0);
-		else if (limit == 1 && i == shu[len])
-			c = dfs(len - 1, res - cnt, false, 1);
-		else if (limit == 2 || (limit == 1 &&  i > shu[len]))
-			c = dfs(len - 1, res - cnt, false, 2);
 
-		if (cnt + c >= res)
-		{
-			if (limit == 0 ||(limit ==1 &&i < shu[len]))
-				c = dfs(len - 1, res - cnt, true, 0);
-			else if (limit == 1 && i == shu[len])
-				c = dfs(len - 1, res - cnt, true, 1);
-			else if (limit == 2|| (limit == 1 &&  i > shu[len]))
-				c = dfs(len - 1, res - cnt, true, 2);
-		}
-		cnt += c;
-		if (finish == true)
-			return 0;
-		ans[len] = -1;
-	}
-	return dp[len][limit] = cnt;
-}
-int findKthNumber(int n, int k)
-{
-	int ans2 = 0;
-		k +=1;
-		finish = false;
-		mem(dp, -1);
-		mem(ans, -1);
-		icnt = 0;
-		while (n)
-		{
-			shu[icnt++] = n % 10;
-			n /= 10;
-		}
-
-		dfs(icnt - 1, k, true, 1);
-		for (int i = icnt - 1; i >= 0; i--)
-			if (ans[i] != -1)
-				ans2 *= 10, ans2 += ans[i];
-
-				return ans2;
-}
-int main()
-{
-#ifdef _local
-	FIN;
-#endif // _local
-	while(cin >> n >> k)
-	{
-		cout << findKthNumber(n, k) << endl;
-	}
-	return 0;
-}
+class Solution {
+public:
+    double x, y;
+    double eps = 1e-7;
+    double getMinDistSum(vector<vector<int>>& positions) {
+        
+        return threefenx(0, 100, positions); 
+    }
+    double threefenx(double minx, double maxx, vector<vector<int>> &positions)
+    {
+        int cnt = 100;
+        double lsum, rsum;
+        while(abs(minx -maxx) > eps)
+        {
+            double l = (minx * 2 + maxx)/3;
+            double r = (minx + maxx* 2)/3;
+            lsum = threefeny(l, 0, 100, positions);
+            rsum = threefeny(r, 0, 100, positions);
+            if(lsum > rsum)
+            minx = l;
+            else 
+            maxx = r;
+        }
+    return lsum;
+    }
+    double threefeny(double x, double miny, double maxy, vector<vector<int>>&positions)
+    {
+        int cnt = 100;
+        double lsum, rsum;
+        while(abs(miny -maxy) > eps)
+        {
+            double l = (miny * 2 + maxy)/3;
+            double r = (miny + maxy* 2)/3;
+            lsum = getDistSum(x, l, positions);
+            rsum =getDistSum(x, r, positions);
+            if(lsum > rsum)
+            miny = l;
+            else 
+            maxy = r;
+        }
+        return lsum;
+    }
+    double getDistSum(double x, double y, vector<vector<int>>&positions)
+    {
+        double sum = 0;
+        for(int i = 0; i< positions.size();i++)
+        {
+            sum += sqrt((positions[i][0] - x)*(positions[i][0] - x) + (positions[i][1] - y)*(positions[i][1] - y));
+        }
+        return sum;
+    }
+};
