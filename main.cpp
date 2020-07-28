@@ -13,69 +13,70 @@ typedef long long LL;
 using namespace std;
 const int MAX = 5e5 +5;
 int n, k;
-int num_cnt[MAX * 2];
-int arr[MAX];
+int jc[20];
+void jiecheng()
+{
+	jc[0] = 1;
+	jc[1] = 1;
+	for (int i = 2; i <= 10; i++)
+		jc[i] = jc[i - 1] * i;
+}
+int cantor(int x)
+{
+	vector<int> arr;
+	while (x)
+	{
+		arr.push_back(x % 10);
+		x /= 10;
+	}
+	reverse(arr.begin(), arr.end());
+	int num = 0;
+	for (int i = 0; i < arr.size(); i++)
+	{
+		int cnt = 0;
+		for (int j = i + 1; j < arr.size(); j++)
+		{
+			if (arr[i] > arr[j])
+				cnt++;
+		}
+		num += cnt * jc[arr.size() - i - 1];
+	}
+	return num + 1;
+}
+vector<int> inv_cantor(int x)
+{
+	x--;
+	vector<int> ans;
+	vector<int> arr;
+	for (int i = 0; i < 5; i++)
+		arr.push_back(i + 1);
+	for (int i = 4; i >= 0; i--)
+	{
+		int shang = x / jc[i];
+		x = x % jc[i];
+		ans.push_back(arr[shang]);
+		arr.erase(arr.begin()+shang);
+	}
+	return ans;
+}
 int main()
 {
+	jiecheng();
 #ifdef _local
 	FIN;
 #endif // _local
-	while (cin >> n >> k)
+	int x;
+	while (cin >> x)
 	{
-		mem(num_cnt, 0);
-		int cnt = 0;
-		int x = 0;
-		map<int, int> mp;
-		for (int i = 0; i < n; i++)
-		{
-			scanf("%d", &x);
-			if (mp.count(x) == 0)
-			{
-				mp[x] = cnt;
-				arr[i] = cnt;
-				cnt++;
-			}
-			else
-			{
-				arr[i] = mp[x];
-			}
-		}
-		int r = 0;
-		num_cnt[arr[0]] ++;
-		int ans = 1;
-		int now = 1;
-		int ans_l = 0;
-		int ans_r = 0;
-		for (int l = 0; l < n; l++)
-		{
-			if (l != 0)
-			{
-				num_cnt[arr[l - 1]] --;
-				if (num_cnt[arr[l - 1]] == 0)
-					now--;
-				if (now > k)
-					continue;
-			}
-			while (r < n - 1)
-			{
-				r++;
-				num_cnt[arr[r]] ++;
-				if (num_cnt[arr[r]] == 1)
-					now++;
-				if (now <= k)
-				{
-
-					if (ans < r - l + 1)
-					{
-						ans = max(ans, r - l + 1);
-						ans_l = l;
-						ans_r = r;
-					}
-				}
-				else break;
-			}
-		}
-		cout << ans_l +1<<" "<<ans_r+1<< endl;
+		cout << x << endl;
+		int ans = 0;
+		ans  =cantor(x);
+		cout << ans << endl;
+		vector<int>  anss;
+		anss = inv_cantor(ans);
+		for (auto i : anss)
+			cout << i;
+		cout << endl << endl;
 	}
 	return 0;
 }
