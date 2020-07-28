@@ -9,108 +9,47 @@
 #define mem(x, y) memset(x, y,sizeof(x))
 typedef long long LL;
 using namespace std;
-const int MAX = 1e3 +5;
-struct edge
+const int MAX = 1e2 +5;
+int dis[MAX][MAX];
+int N, M;
+void floyd()
 {
-	int nxt;
-	int to;
-	int p;
-	int d;
-}E[MAX * 111];
-int head[MAX], rear = 0;
-int S = 0, T = 0;
-void edge_init()
-{
-	mem(head, -1);
-	rear = 0;
-}
-void edge_add(int a, int b, int d, int p)
-{
-	E[rear].nxt = head[a];
-	E[rear].p = p;
-	E[rear].d = d;
-	E[rear].to = b;
-	head[a] = rear++;
-}
-struct Node
-{
-	Node(int d, int p, int node):d(d), p(p), node(node){}
-	int d;
-	int p;
-	int node;
-	bool operator <(const Node &x)const {
-		if (d != x.d)
-			return d < x.d;
-		return p < x.p;
-	}
-	bool operator >(const Node &x)const {
-		if (d != x.d)
-			return d > x.d;
-		return p > x.p;
-	}
-};
-
-int Dis[MAX], P[MAX];
-void dijkstra(int& ans_d, int& ans_p)
-{
-	mem(Dis, 0x3f);
-	mem(P, 0x3f);
-	Dis[S] = 0;
-	P[S] = 0;
-	priority_queue<Node, vector<Node>, greater<Node> > Q;
-	Q.push(Node(0, 0, S));
-	while (!Q.empty())
+	for (int k = 0; k < N; k++)
 	{
-		Node tmp = Q.top();
-		Q.pop();
-		int dis = tmp.d;
-		int p = tmp.p;
-		int node = tmp.node;
-		for (int i = head[node]; ~i; i = E[i].nxt)
+		for (int i = 0; i < N; i++)
 		{
-			int to = E[i].to;
-			if (Dis[to] > Dis[node] + E[i].d)
+			for (int j = 0; j < i; j++)
 			{
-				Dis[to] = Dis[node] + E[i].d;
-				P[to] = P[node] + E[i].p;
+				dis[i][j] = min(dis[i][j], (i > k?dis[i][k]:dis[k][i]) + (k>j?dis[k][j]:dis[j][k]));
 			}
-			else if (Dis[to] == Dis[node] + E[i].d && P[to] > P[node] + E[i].p)
-			{
-				P[to] = P[node] + E[i].p;
-			}
-			else {
-				continue;
-			}
-			Q.push(Node(Dis[to], P[to], to));
 		}
 	}
-	ans_d = Dis[T];
-	ans_p = P[T];
 }
 int main()
 {
 #ifdef _local
 	FIN;
 #endif // _local
-
-	int n, m;
-	while (cin >> n >> m)
+	while (cin >> N >> M)
 	{
-		if (n == 0)
-			break;
-		edge_init();
-		int a = 0, b = 0, d = 0, p = 0;
-		for (int i = 0; i < m; i++)
+		mem(dis, 0x3f);
+		for (int i = 0; i < N; i++)
+			dis[i][i] = 1;
+		int a =0, b = 0;
+		for (int i = 0; i < M; i++)
 		{
-			scanf("%d %d %d %d", &a, &b, &d, &p);
-			edge_add(a, b, d, p);
-			edge_add(b, a, d, p);
+			scanf("%d %d", &a, &b);
+			if (a < b)
+				swap(a, b);
+			dis[a][b] = 1;
 		}
-		cin >> S >> T;
-		int ans_d, ans_p;
-		dijkstra(ans_d, ans_p);
-		cout << ans_d << " " << ans_p << endl;
-
+		floyd();
+		bool isok = true;
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < i; j++)
+				if (dis[i][j] > 7)
+					isok = false;
+		cout << (isok ? "Yes" : "No") << endl;
 	}
 	return 0;
 }
